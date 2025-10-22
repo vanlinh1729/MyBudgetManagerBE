@@ -1,0 +1,119 @@
+# =========================
+# 👇 DOTNET
+# =========================
+bin/
+obj/
+out/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# IDE & Editor
+.vs/
+.idea/
+*.swp
+*.lock.json
+*.bak
+*.tmp
+
+# Logs
+*.log
+logs/
+LogFiles/
+
+# Dotnet secret files
+secrets.json
+appsettings.Local.json
+appsettings.*.local.json
+appsettings.Development.json
+
+# Sensitive environment configs
+*.env
+.env.local
+.env.development
+
+# =========================
+# 👇 FRONTEND (Angular)
+# =========================
+/ClientApp/node_modules/
+/ClientApp/dist/
+/ClientApp/.angular/cache/
+/ClientApp/.vscode/
+/ClientApp/.idea/
+/ClientApp/.DS_Store
+/ClientApp/package-lock.json
+/ClientApp/yarn.lock
+
+# =========================
+# 👇 OS FILES
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# 👇 MISC
+# =========================
+/wwwroot/uploads/
+/wwwroot/temp/
+/wwwroot/images/temp/
+*.db
+*.sqlite
+*.sqlite3
+*.pdb
+*.mdb
+*.bak
+*.cache
+*.log
+*.key
+*.pem
+*.crt
+
+# =========================
+# 👇 TESTS / BUILDS
+# =========================
+TestResults/
+CoverageReports/
+*.trx
+*.coverage
+*.coveragexml
+
+# =========================
+# 👇 Rider / Resharper / JetBrains
+# =========================
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+.idea/
+
+# =========================
+# 👇 TEMP / LOCAL / TOOLS
+# =========================
+/tools/
+/tmp/
+/temp/
+/local/
+/local.settings.json
+.envrc
+.vscode/
+.vscode-test/
+.vscode-insiders/
+
+# =========================
+# 👇 GIT / DEPLOYMENT
+# =========================
+*.orig
+*.patch
+*.rej
+*.diff
+*.bak
+*.bkp
+
+# =========================
+# 👇 AUTH / SECURITY
+# =========================
+/keys/
+/secrets/
+/certs/
+/private/
+/config/private/
