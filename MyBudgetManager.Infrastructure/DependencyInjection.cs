@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,7 +25,8 @@ public static class DependencyInjection
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
-      
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IUserBalanceRepository, UserBalanceRepository>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -48,6 +50,7 @@ public static class DependencyInjection
         configuration.GetSection("JwtSettings").Bind(jwtSettings);
         services.AddSingleton(jwtSettings);
 
+        
         services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -63,9 +66,23 @@ public static class DependencyInjection
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = jwtSettings.Issuer,
                     ValidAudience = jwtSettings.Audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
+                    ClockSkew = TimeSpan.Zero // ⏱ Không cho phép lệch thời gian 5 phút mặc định
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnAuthenticationFailed = context =>
+                    {
+                        return Task.CompletedTask;
+                    },
+                    OnChallenge = context =>
+                    {
+                        return Task.CompletedTask;
+                    }
                 };
             });
+        services.AddAuthorization();
         return services;
     }
 }

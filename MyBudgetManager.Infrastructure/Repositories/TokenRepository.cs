@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using MyBudgetManager.Application.Common.Exceptions;
 using MyBudgetManager.Application.Interfaces.Repositories;
 using MyBudgetManager.Domain.Common;
 using MyBudgetManager.Domain.Entities;
@@ -61,8 +62,8 @@ public class TokenRepository : Repository<Token>, ITokenRepository
     public async Task DeleteAllByUserAndTypeAsync(Guid userId, TokenType tokenType)
     {
         var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
-        if (user == null) throw new Exception("User not found");
-        if (user.Status == AccountStatus.Active) throw new Exception("User already active");
+        if (user == null) throw new NotFoundException("User not found");
+        if (user.Status == AccountStatus.Active) throw new ConflictException("User already active");
 
         // Xóa token cũ
         var oldTokens = await GetAllByUserAndTypeAsync(user.Id, TokenType.ActivationToken);

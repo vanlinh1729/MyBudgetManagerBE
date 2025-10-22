@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using MyBudgetManager.Application.Common.Exceptions;
 using MyBudgetManager.Application.Interfaces;
 using MyBudgetManager.Application.Interfaces.Repositories;
 using MyBudgetManager.Application.Interfaces.Services;
@@ -28,12 +29,12 @@ public class JwtTokenService : IJwtTokenService
     {
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, email),
+            new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+            new Claim(ClaimTypes.Email, email),
             new Claim(ClaimTypes.Role, role)
         };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Secret));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.SecretKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
@@ -65,10 +66,10 @@ public class JwtTokenService : IJwtTokenService
     public async Task<Token> ValidateRefreshTokenAsync(string refreshToken)
     {
         var token = await _tokenRepository.GetByValueAsync(refreshToken)
-                    ?? throw new Exception("Invalid refresh token.");
+                    ?? throw new NotFoundException("Invalid refresh token.");
 
         if (token.ExpireAt < DateTime.UtcNow || token.RevokedAt != null)
-            throw new Exception("Expired or revoked token.");
+            throw new ConflictException("Expired or revoked token.");
 
         return token;
     }
