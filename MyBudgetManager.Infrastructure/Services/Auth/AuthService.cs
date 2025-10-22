@@ -1,3 +1,4 @@
+using MyBudgetManager.Application.Common.Exceptions;
 using MyBudgetManager.Application.Common.Validators;
 using MyBudgetManager.Application.Features.Auth.DTOs;
 using MyBudgetManager.Application.Interfaces;
@@ -28,11 +29,9 @@ public class AuthService: IAuthService
     }
 
     public async Task RegisterAsync(string email, string password, string name)
-    {
-        if(!EmailValidator.IsValid(email))
-            throw new Exception("Invalid email format.");
+    { 
         if (await _userRepository.GetByEmailAsync(email) != null)
-            throw new Exception("Email already exists.");
+            throw new ConflictException("Email already exists.");
 
         var hashedPassword = _passwordHasher.HashPassword(password);
 
@@ -66,10 +65,10 @@ public class AuthService: IAuthService
     public async Task<LoginResultDto> LoginAsync(string email, string password)
     {
         var user = await _userRepository.GetByEmailAsync(email)
-                   ?? throw new Exception("Invalid credentials.");
+                   ?? throw new UnauthorizedException("Invalid credentials.");
 
         if (!_passwordHasher.VerifyPassword( user.PasswordHash, password))
-            throw new Exception("Invalid credentials.");
+            throw new UnauthorizedException("Invalid credentials.");
 
         var accessToken = _jwtService.GenerateAccessToken(user.Id, user.Email, user.SystemRole.ToString());
         var refreshToken = await _jwtService.CreateRefreshTokenAsync(user.Id);
@@ -83,7 +82,7 @@ public class AuthService: IAuthService
     {
         var token = await _jwtService.ValidateRefreshTokenAsync(refreshToken);
         var user = await _userRepository.GetByIdAsync(token.UserId)
-                   ?? throw new Exception("User not found.");
+                   ?? throw new NotFoundException("User not found.");
 
         await _jwtService.RevokeTokenAsync(token);
         var newToken = await _jwtService.CreateRefreshTokenAsync(user.Id);
@@ -96,7 +95,7 @@ public class AuthService: IAuthService
     public async Task RevokeTokenAsync(Guid userId, string refreshToken)
     {
         var token = await _tokenRepository.GetValidTokenAsync(userId, refreshToken)
-                    ?? throw new Exception("Token not found.");
+                    ?? throw new NotFoundException("Token not found.");
         await _jwtService.RevokeTokenAsync(token);
     }
     public async Task ActivateAccountAsync(string tokenValue)
@@ -104,14 +103,14 @@ public class AuthService: IAuthService
         var token = await _tokenRepository.GetByValueAsync(tokenValue);
 
         if (token == null || token.TokenType != TokenType.ActivationToken)
-            throw new Exception("Invalid activation token");
+            throw new ConflictException("Invalid activation token");
 
         if (token.ExpireAt < DateTime.UtcNow)
-            throw new Exception("Activation token expired");
+            throw new BadRequestException("Activation token expired");
 
         var user = await _userRepository.GetByIdAsync(token.UserId);
         if (user == null)
-            throw new Exception("User not found");
+            throw new NotFoundException("User not found");
 
         user.Status = AccountStatus.Active;
         _tokenRepository.Remove(token);
@@ -123,12 +122,11 @@ public class AuthService: IAuthService
     public async Task ResendActivationEmailAsync(string email)
     {
         var user = await _userRepository.GetByEmailAsync(email);
-        if (user == null) throw new Exception("User not found");
-        if (user.Status == AccountStatus.Active) throw new Exception("User already active");
+        if (user == null) throw new NotFoundException("User not found");
+        if (user.Status == AccountStatus.Active) throw new ConflictException("User already active");
 
-        // Xóa token cũ
-        var oldTokens = await _tokenRepository.GetAllByUserAndTypeAsync(user.Id, TokenType.ActivationToken);
-        foreach (var t in oldTokens) _tokenRepository.Remove(t);
+        //xoa token cu
+        await _tokenRepository.DeleteAllByUserAndTypeAsync(user.Id, TokenType.ActivationToken);
         await _uow.SaveChangesAsync();
 
         var newTokenValue = Guid.NewGuid().ToString("N");

@@ -16,6 +16,7 @@ public interface ITokenRepository: IRepository<Token>
     Task RevokeAllUserTokensAsync(Guid userId);
     
     Task<IEnumerable<Token>> GetAllByUserAndTypeAsync(Guid userId, TokenType tokenType);
+    Task DeleteAllByUserAndTypeAsync(Guid userId, TokenType tokenType);
 
 
 }

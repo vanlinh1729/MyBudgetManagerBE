@@ -6,4 +6,4 @@ public record RegisterUserCommand(
     string Email,
     string Password,
     string Name
-) : IRequest; 
+) : IRequest<Unit>; 

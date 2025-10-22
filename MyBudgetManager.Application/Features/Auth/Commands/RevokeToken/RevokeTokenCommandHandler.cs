@@ -3,7 +3,7 @@ using MyBudgetManager.Application.Interfaces.Services;
 
 namespace MyBudgetManager.Application.Features.Auth.Commands.RevokeToken;
 
-public class RevokeTokenCommandHandler : IRequestHandler<RevokeTokenCommand>
+public class RevokeTokenCommandHandler : IRequestHandler<RevokeTokenCommand, Unit>
 {
     private readonly IAuthService _authService;
 

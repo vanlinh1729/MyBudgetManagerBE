@@ -8,7 +8,7 @@ using MyBudgetManager.Domain.Entities;
 
 namespace MyBudgetManager.Application.Features.Auth.Commands.RegisterUser;
 
-public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand>
+public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, Unit>
 {
     private readonly IAuthService _authService;
 
