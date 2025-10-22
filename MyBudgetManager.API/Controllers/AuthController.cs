@@ -1,11 +1,11 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using MyBudgetManager.Application.Features.Auth.Commands.ActivateAccount;
 using MyBudgetManager.Application.Features.Auth.Commands.Login;
 using MyBudgetManager.Application.Features.Auth.Commands.RefreshToken;
 using MyBudgetManager.Application.Features.Auth.Commands.RegisterUser;
 using MyBudgetManager.Application.Features.Auth.Commands.ResendActivationEmail;
 using MyBudgetManager.Application.Features.Auth.Commands.RevokeToken;
+using MyBudgetManager.Application.Features.Auth.Queries.ActivateAccount;
 
 namespace MyBudgetManager.API.Controllers;
 
@@ -50,7 +50,7 @@ public class AuthController : ControllerBase
     [HttpGet("activate")]
     public async Task<IActionResult> Activate([FromQuery] string token)
     {
-        await _mediator.Send(new ActivateAccountCommand(token));
+        await _mediator.Send(new ActivateAccountQuery(token));
         return Ok(new { message = "Account activated successfully!" });
     }
 

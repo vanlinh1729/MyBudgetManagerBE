@@ -1,3 +1,4 @@
+using MyBudgetManager.Application.Common.Validators;
 using MyBudgetManager.Application.Features.Auth.DTOs;
 using MyBudgetManager.Application.Interfaces;
 using MyBudgetManager.Application.Interfaces.Repositories;
@@ -28,6 +29,8 @@ public class AuthService: IAuthService
 
     public async Task RegisterAsync(string email, string password, string name)
     {
+        if(!EmailValidator.IsValid(email))
+            throw new Exception("Invalid email format.");
         if (await _userRepository.GetByEmailAsync(email) != null)
             throw new Exception("Email already exists.");
 
