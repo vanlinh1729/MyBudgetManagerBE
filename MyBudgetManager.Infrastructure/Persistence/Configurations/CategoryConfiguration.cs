@@ -15,13 +15,16 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
             .HasMaxLength(100);
 
         builder.Property(c => c.Type)
+            .HasConversion<string>()
             .IsRequired();
 
+        // User → Category: Restrict (cannot delete user if categories exist)
         builder.HasOne(c => c.User)
             .WithMany(u => u.Categories)
             .HasForeignKey(c => c.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
+        // Category → Transaction: Restrict (cannot delete category if transactions exist)
         builder.HasMany(c => c.Transactions)
             .WithOne(t => t.Category)
             .HasForeignKey(t => t.CategoryId)

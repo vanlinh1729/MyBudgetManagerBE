@@ -69,6 +69,9 @@ public class AuthService: IAuthService
 
         if (!_passwordHasher.VerifyPassword( user.PasswordHash, password))
             throw new UnauthorizedException("Invalid credentials.");
+        
+        if (user.Status != AccountStatus.Active)
+            throw new UnauthorizedException("Account is not activated.");
 
         var accessToken = _jwtService.GenerateAccessToken(user.Id, user.Email, user.SystemRole.ToString());
         var refreshToken = await _jwtService.CreateRefreshTokenAsync(user.Id);

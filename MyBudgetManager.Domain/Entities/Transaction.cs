@@ -8,8 +8,8 @@ public class Transaction :BaseEntity
     public Guid CategoryId { get; set; }
     public Guid? GroupId { get; set; }
     public decimal Amount { get; set; }
-    public DateTime Date { get; set; }
-    public string Note { get; set; }
+    public DateTime Date { get; set; } = DateTime.UtcNow;
+    public string? Note { get; set; } 
     public string? ImageUrl { get; set; }
     
     // ✅ Navigation

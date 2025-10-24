@@ -20,25 +20,28 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
         builder.Property(t => t.Date)
             .IsRequired();
 
+        // UserBalance → Transaction: Cascade (delete balance deletes its transactions)
         builder.HasOne(t => t.UserBalance)
             .WithMany(b => b.Transactions)
             .HasForeignKey(t => t.UserBalanceId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        // Category → Transaction: Restrict (cannot delete category if transactions exist)
         builder.HasOne(t => t.Category)
             .WithMany(c => c.Transactions)
             .HasForeignKey(t => t.CategoryId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        // Group → Transaction: SetNull (transactions can exist without group)
         builder.HasOne(t => t.Group)
             .WithMany(g => g.Transactions)
             .HasForeignKey(t => t.GroupId)
             .OnDelete(DeleteBehavior.SetNull);
 
+        // Transaction → GroupTransactionSplit: Cascade
         builder.HasMany(t => t.GroupTransactionSplits)
             .WithOne(s => s.Transaction)
             .HasForeignKey(s => s.TransactionId)
             .OnDelete(DeleteBehavior.Cascade);
-        
     }
 }

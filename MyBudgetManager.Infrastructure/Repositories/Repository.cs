@@ -15,6 +15,10 @@ public class Repository <T> : IRepository<T> where T : class
     public async Task<T?> GetByIdAsync(Guid id)
         => await _context.Set<T>().FindAsync(id);
 
+    public IQueryable<T> GetQuery(bool asTracking = false)
+    {
+        return asTracking ? _context.Set<T>().AsQueryable() : _context.Set<T>().AsNoTracking();
+    }
     public async Task<IEnumerable<T>> GetAllAsync()
         => await _context.Set<T>().ToListAsync();
 

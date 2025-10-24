@@ -9,7 +9,6 @@
     <ItemGroup>
       <Folder Include="Common\Interfaces\" />
       <Folder Include="Features\Auth\Queries\" />
-      <Folder Include="Features\Categories\Queries\" />
       <Folder Include="Features\Transactions\Commands\CreateUser\" />
       <Folder Include="Features\Transactions\Queries\" />
       <Folder Include="Features\UserBalances\Commands\" />
@@ -29,6 +28,7 @@
       <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
       <PackageReference Include="MediatR" Version="13.0.0" />
       <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.1.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
     </ItemGroup>
 
 </Project>

@@ -13,16 +13,17 @@ public class GroupConfiguration : IEntityTypeConfiguration<Group>
         builder.Property(g => g.Name)
             .IsRequired()
             .HasMaxLength(100);
-        
 
-        builder.HasMany<GroupMember>()
-            .WithOne(a=>a.Group)
+        // Group → GroupMember: Cascade (delete group deletes its members)
+        builder.HasMany(g => g.Members)
+            .WithOne(m => m.Group)
             .HasForeignKey(m => m.GroupId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        // Group → Transaction: SetNull (transactions can exist without group)
         builder.HasMany(g => g.Transactions)
             .WithOne(t => t.Group)
             .HasForeignKey(t => t.GroupId)
             .OnDelete(DeleteBehavior.SetNull);
-        
     }
 }

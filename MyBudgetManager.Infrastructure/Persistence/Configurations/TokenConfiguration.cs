@@ -8,18 +8,16 @@ public class TokenConfiguration : IEntityTypeConfiguration<Token>
 {
     public void Configure(EntityTypeBuilder<Token> builder)
     {
-        // 🔑 Table name
         builder.ToTable("Tokens");
-       
-        // 🆔 Primary key
+
         builder.HasKey(t => t.Id);
 
-        // 📦 Properties
         builder.Property(t => t.TokenValue)
             .IsRequired()
             .HasMaxLength(500);
 
         builder.Property(t => t.TokenType)
+            .HasConversion<string>()
             .IsRequired();
 
         builder.Property(t => t.ExpireAt)
@@ -40,17 +38,16 @@ public class TokenConfiguration : IEntityTypeConfiguration<Token>
             .HasMaxLength(100)
             .IsRequired(false);
 
-        // 👤 Relationship
+        // User → Token: Cascade
         builder.HasOne(t => t.User)
             .WithMany(u => u.Tokens)
             .HasForeignKey(t => t.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // ⚡ Index for quick lookup
+        // Indexes for performance
         builder.HasIndex(t => t.TokenValue)
             .IsUnique();
 
         builder.HasIndex(t => t.UserId);
-        
     }
 }
