@@ -27,7 +27,7 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Register(RegisterUserCommand command)
     {
         await _mediator.Send(command);
-        return Ok(new { message = "Registration successful" });
+        return Ok(new { message = "Registration successful, please check your email to active account." });
     }
 
     /// <summary>

@@ -10,6 +10,7 @@ public class Transaction :BaseEntity
     public decimal Amount { get; set; }
     public DateTime Date { get; set; } = DateTime.UtcNow;
     public string? Note { get; set; } 
+    
     public string? ImageUrl { get; set; }
     
     // ✅ Navigation

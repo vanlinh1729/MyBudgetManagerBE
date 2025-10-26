@@ -34,18 +34,21 @@ public class CreateCategoryCommandHandler: IRequestHandler<CreateCategoryCommand
             UserId = userId,
             Name = request.Name,
             Type = request.Type,
-            Icon = request.Icon
+            Icon = request.Icon,
+            ParentCategoryId = request.ParentCategoryId,
+            IsDefault = false
         };
         await _categoryRepository.AddAsync(category);
         await _unitOfWork.SaveChangesAsync();
 
         // Map sang DTO để trả ra ngoài
-         return new CategoryDto
+           return new CategoryDto
         {
             Id = category.Id,
             Name = category.Name,
             Type = category.Type,
-            Icon = category.Icon
+            Icon = category.Icon,
+            ParentCategoryId = category.ParentCategoryId,
         };
     }
 }

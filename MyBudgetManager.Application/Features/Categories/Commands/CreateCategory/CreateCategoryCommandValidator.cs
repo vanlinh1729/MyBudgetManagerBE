@@ -8,7 +8,7 @@ public class CreateCategoryCommandValidator : AbstractValidator<CreateCategoryCo
     {
         RuleFor(x => x.UserId).NotEmpty();
         RuleFor(x => x.Name)
-            .NotEmpty().WithMessage("Name is required")
+            .NotEmpty().WithMessage("Name of Category is required")
             .MaximumLength(100);
         RuleFor(x => x.Type).IsInEnum();
     }

@@ -1,6 +1,8 @@
+using MediatR;
+
 namespace MyBudgetManager.Application.Features.Categories.Commands.DeleteCategory;
 
-public class DeleteCategoryCommand
+public record DeleteCategoryCommand(Guid Id) : IRequest<Unit>
 {
     
 }

@@ -18,6 +18,15 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
             .HasConversion<string>()
             .IsRequired();
 
+        builder.Property(c => c.IsDefault)
+            .IsRequired()
+            .HasDefaultValue(false);
+        
+        builder.HasOne(c => c.ParentCategory)
+            .WithMany(c => c.SubCategories)
+            .HasForeignKey(c => c.ParentCategoryId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
         // User → Category: Restrict (cannot delete user if categories exist)
         builder.HasOne(c => c.User)
             .WithMany(u => u.Categories)

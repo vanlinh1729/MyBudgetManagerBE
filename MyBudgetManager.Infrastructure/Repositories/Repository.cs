@@ -25,6 +25,13 @@ public class Repository <T> : IRepository<T> where T : class
     public async Task AddAsync(T entity)
         => await _context.Set<T>().AddAsync(entity);
 
+    public async Task AddRangeAsync(IEnumerable<T> entities)
+    {
+        if (entities == null)
+            throw new ArgumentNullException(nameof(entities));
+
+        await _context.AddRangeAsync(entities);
+    }
     public void Update(T entity)
         => _context.Set<T>().Update(entity);
 

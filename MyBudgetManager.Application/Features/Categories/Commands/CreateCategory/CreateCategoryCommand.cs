@@ -8,5 +8,6 @@ public record CreateCategoryCommand(
     Guid? UserId,
     string Name,
     CategoryType Type,
-    string? Icon
+    string? Icon,
+    Guid? ParentCategoryId
 ) : IRequest<CategoryDto>; 

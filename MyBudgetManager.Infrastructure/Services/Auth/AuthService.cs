@@ -13,19 +13,23 @@ public class AuthService: IAuthService
 {
     private readonly IUserRepository _userRepository;
     private readonly ITokenRepository _tokenRepository;
+    private readonly IUserBalanceRepository _userBalanceRepository;
     private readonly IPasswordHasher _passwordHasher;
     private readonly IJwtTokenService _jwtService;
     private readonly IUnitOfWork _uow;
     private readonly IEmailService _emailService;
+    private readonly IDefaultCategoryService _defaultCategoryService;
 
-    public AuthService(IUserRepository userRepository, ITokenRepository tokenRepository, IPasswordHasher passwordHasher, IJwtTokenService jwtService, IUnitOfWork uow, IEmailService emailService)
+    public AuthService(IUserRepository userRepository, ITokenRepository tokenRepository, IUserBalanceRepository userBalanceRepository, IPasswordHasher passwordHasher, IJwtTokenService jwtService, IUnitOfWork uow, IEmailService emailService, IDefaultCategoryService defaultCategoryService)
     {
         _userRepository = userRepository;
         _tokenRepository = tokenRepository;
+        _userBalanceRepository = userBalanceRepository;
         _passwordHasher = passwordHasher;
         _jwtService = jwtService;
         _uow = uow;
         _emailService = emailService;
+        _defaultCategoryService = defaultCategoryService;
     }
 
     public async Task RegisterAsync(string email, string password, string name)
@@ -120,6 +124,21 @@ public class AuthService: IAuthService
         _userRepository.Update(user);
 
         await _uow.SaveChangesAsync();
+        
+        //clone default category sua khi active tai khoan
+        await _defaultCategoryService.CreateDefaultCategoriesForUserAsync(user.Id);
+        
+        //tao userBalance sau khi active tai khoan
+        var userBalance = new UserBalance()
+        {
+            UserId = user.Id,
+            Balance = 0,
+            Currency = Currency.VND,
+            Name = "Main Wallet"
+        };
+        await _userBalanceRepository.AddAsync(userBalance);
+        await _uow.SaveChangesAsync();
+        
     }
 
     public async Task ResendActivationEmailAsync(string email)

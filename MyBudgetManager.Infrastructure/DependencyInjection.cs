@@ -12,6 +12,7 @@ using MyBudgetManager.Infrastructure.Persistence;
 using MyBudgetManager.Infrastructure.Repositories;
 using MyBudgetManager.Infrastructure.Services;
 using MyBudgetManager.Infrastructure.Services.Auth;
+using MyBudgetManager.Infrastructure.Services.DefaultCategory;
 using MyBudgetManager.Infrastructure.Services.Email;
 using MyBudgetManager.Infrastructure.Settings;
 
@@ -39,6 +40,7 @@ public static class DependencyInjection
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<IDefaultCategoryService, DefaultCategoryService>();
 
 
 

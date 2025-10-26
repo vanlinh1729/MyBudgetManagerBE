@@ -1,14 +1,16 @@
+using System.Linq.Expressions;
 using MediatR;
+using MyBudgetManager.Application.Common.Helpers;
+using MyBudgetManager.Application.Common.Models;
 using MyBudgetManager.Application.Features.Categories.DTOs;
 using MyBudgetManager.Application.Interfaces;
 using MyBudgetManager.Application.Interfaces.Services;
-using Microsoft.EntityFrameworkCore;
-
+using MyBudgetManager.Domain.Common;
 using MyBudgetManager.Domain.Entities;
 
 namespace MyBudgetManager.Application.Features.Categories.Queries.GetCategories;
 
-public class GetCategoriesQueryHandler : IRequestHandler<GetCategoriesQuery, List<CategoryDto>>
+public class GetCategoriesQueryHandler : IRequestHandler<GetCategoriesQuery, PagedResult<CategoryDto>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ICurrentUserService _currentUser;
@@ -19,23 +21,46 @@ public class GetCategoriesQueryHandler : IRequestHandler<GetCategoriesQuery, Lis
         _currentUser = currentUser;
     }
 
-    public async Task<List<CategoryDto>> Handle(GetCategoriesQuery request, CancellationToken cancellationToken)
+    public async Task<PagedResult<CategoryDto>> Handle(GetCategoriesQuery request, CancellationToken cancellationToken)
     {
         var userId = _currentUser.UserId ?? throw new UnauthorizedAccessException("User not authenticated.");
 
-        var categories = await _unitOfWork
-            .CategoryRepository              // lấy repository cho entity Category
-            .GetQuery()                          // lấy IQueryable<Category>
-            .Where(c => c.UserId == userId)      // filter theo User hiện tại
-            .Select(c => new CategoryDto         // map sang DTO
+        // 🔹 1. Base query
+        var query = _unitOfWork.CategoryRepository
+            .GetQuery()
+            .Where(c => c.UserId == userId);
+
+        // 🔹 2. Apply filter bằng FilterHelper
+        if (!string.IsNullOrEmpty(request.Type) &&
+            Enum.TryParse<CategoryType>(request.Type, true, out var categoryType))
+            query = query.ApplyFilter(c => c.Type == categoryType);
+
+        // 🔹 3. Định nghĩa map field có thể sort
+        var sortableFields = new Dictionary<string, Expression<Func<Category, object>>>
+        {
+            ["name"] = c => c.Name,
+            ["createdat"] = c => c.CreatedAt
+        };
+
+        // 🔹 4. Apply sort bằng SortingHelper
+        query = query.ApplySorting(request.SortBy, request.SortOrder, sortableFields);
+
+        // 🔹 5. Nếu không có sortBy → sort mặc định
+        if (string.IsNullOrWhiteSpace(request.SortBy))
+            query = query.OrderByDescending(c => c.CreatedAt);
+
+        // 🔹 6. Select sang DTO và apply pagination helper
+        var pagedResult = await query
+            .Select(c => new CategoryDto
             {
                 Id = c.Id,
                 Name = c.Name,
                 Type = c.Type,
-                Icon = c.Icon
+                Icon = c.Icon,
+                IsDefault = c.IsDefault
             })
-            .ToListAsync(cancellationToken);
+            .ToPagedResultAsync(request.PageNumber, request.PageSize, cancellationToken);
 
-        return categories;
+        return pagedResult;
     }
 }
