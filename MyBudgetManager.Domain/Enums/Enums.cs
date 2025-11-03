@@ -28,6 +28,11 @@ public enum CategoryType
     Income,
     Expense,
 }
+public enum TransactionType
+{
+    Income,
+    Expense,
+}
 
 public enum Role
 {

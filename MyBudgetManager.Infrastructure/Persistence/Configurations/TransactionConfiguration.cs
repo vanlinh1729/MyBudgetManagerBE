@@ -19,6 +19,10 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
 
         builder.Property(t => t.Date)
             .IsRequired();
+        
+        builder.Property(t => t.Type)
+            .HasConversion<int>() // Lưu enum dưới dạng số
+            .IsRequired();
 
         // UserBalance → Transaction: Cascade (delete balance deletes its transactions)
         builder.HasOne(t => t.UserBalance)
