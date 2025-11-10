@@ -6,39 +6,45 @@ namespace MyBudgetManager.Infrastructure.Services.Auth;
 
 public class PasswordHasher : IPasswordHasher
 {
+    private const int Version = 1;
+    private const int SaltSize = 16;    // 128-bit
+    private const int KeySize = 32;     // 256-bit
+    private const int Iterations = 310000;
+
     public string HashPassword(string password)
     {
-        // Tạo salt 128-bit
-        byte[] salt = RandomNumberGenerator.GetBytes(128 / 8);
+        byte[] salt = RandomNumberGenerator.GetBytes(SaltSize);
 
-        // Hash bằng PBKDF2
-        string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+        byte[] hash = KeyDerivation.Pbkdf2(
             password: password,
             salt: salt,
             prf: KeyDerivationPrf.HMACSHA256,
-            iterationCount: 10000,
-            numBytesRequested: 256 / 8));
+            iterationCount: Iterations,
+            numBytesRequested: KeySize
+        );
 
-        // Lưu salt + hash
-        return $"{Convert.ToBase64String(salt)}.{hashed}";
+        return $"{Version}.{Iterations}.{Convert.ToBase64String(salt)}.{Convert.ToBase64String(hash)}";
     }
 
-    public bool VerifyPassword(string hash, string password)
+    public bool VerifyPassword(string saved, string password)
     {
-        var parts = hash.Split('.');
-        if (parts.Length != 2)
+        var parts = saved.Split('.');
+        if (parts.Length != 4)
             return false;
 
-        var salt = Convert.FromBase64String(parts[0]);
-        var storedHash = parts[1];
+        int version = int.Parse(parts[0]);
+        int iterations = int.Parse(parts[1]);
+        byte[] salt = Convert.FromBase64String(parts[2]);
+        byte[] storedHash = Convert.FromBase64String(parts[3]);
 
-        var computedHash = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+        byte[] computedHash = KeyDerivation.Pbkdf2(
             password: password,
             salt: salt,
             prf: KeyDerivationPrf.HMACSHA256,
-            iterationCount: 10000,
-            numBytesRequested: 256 / 8));
+            iterationCount: iterations,
+            numBytesRequested: storedHash.Length
+        );
 
-        return storedHash == computedHash;
+        return CryptographicOperations.FixedTimeEquals(storedHash, computedHash);
     }
 }

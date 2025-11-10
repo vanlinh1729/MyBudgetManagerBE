@@ -5,7 +5,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MyBudgetManager.API.Middlewares;
 using MyBudgetManager.Application;
+using MyBudgetManager.Application.Interfaces.Services;
 using MyBudgetManager.Infrastructure;
+using MyBudgetManager.Infrastructure.Persistence;
+using MyBudgetManager.Infrastructure.Persistence.SeedData;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -64,6 +67,15 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
 var app = builder.Build();
+
+// SEED DATA
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
+
+    await SeedData.SeedAsync(context,hasher);
+}
 
 // Middlewares
 app.UseMiddleware<ExceptionHandlingMiddleware>();
