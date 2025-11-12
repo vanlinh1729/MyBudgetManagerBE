@@ -19,11 +19,5 @@ public class GroupConfiguration : IEntityTypeConfiguration<Group>
             .WithOne(m => m.Group)
             .HasForeignKey(m => m.GroupId)
             .OnDelete(DeleteBehavior.Cascade);
-
-        // Group → Transaction: SetNull (transactions can exist without group)
-        builder.HasMany(g => g.Transactions)
-            .WithOne(t => t.Group)
-            .HasForeignKey(t => t.GroupId)
-            .OnDelete(DeleteBehavior.SetNull);
     }
 }

@@ -8,9 +8,7 @@
 
     <ItemGroup>
       <Folder Include="Features\Auth\Queries\" />
-      <Folder Include="Features\Categories\Services\" />
-      <Folder Include="Features\Transactions\Queries\GetAllTransactions\" />
-      <Folder Include="Features\UserBalances\Commands\" />
+      <Folder Include="Features\Personal\" />
       <Folder Include="Features\Users\Queries\" />
       <Folder Include="Services\" />
     </ItemGroup>

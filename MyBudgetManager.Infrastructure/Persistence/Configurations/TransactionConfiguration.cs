@@ -35,17 +35,5 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
             .WithMany(c => c.Transactions)
             .HasForeignKey(t => t.CategoryId)
             .OnDelete(DeleteBehavior.Restrict);
-
-        // Group → Transaction: SetNull (transactions can exist without group)
-        builder.HasOne(t => t.Group)
-            .WithMany(g => g.Transactions)
-            .HasForeignKey(t => t.GroupId)
-            .OnDelete(DeleteBehavior.SetNull);
-
-        // Transaction → GroupTransactionSplit: Cascade
-        builder.HasMany(t => t.GroupTransactionSplits)
-            .WithOne(s => s.Transaction)
-            .HasForeignKey(s => s.TransactionId)
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }

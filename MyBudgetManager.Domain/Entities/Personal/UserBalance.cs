@@ -8,7 +8,7 @@ public class UserBalance : BaseEntity
     public Guid UserId { get; set; }
     public string? Name { get; set; }
     public Currency Currency { get; set; }
-    public decimal Balance { get; set; }
+    public decimal Balance { get; set; } = 0;
     
     //nav props
     public User User { get; set; } = null!;

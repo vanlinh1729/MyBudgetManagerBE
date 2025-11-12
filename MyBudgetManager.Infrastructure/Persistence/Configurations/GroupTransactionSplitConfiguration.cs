@@ -14,12 +14,6 @@ public class GroupTransactionSplitConfiguration : IEntityTypeConfiguration<Group
             .HasColumnType("decimal(18,2)")
             .IsRequired();
 
-        // Transaction → GroupTransactionSplit: Cascade
-        builder.HasOne(s => s.Transaction)
-            .WithMany(t => t.GroupTransactionSplits)
-            .HasForeignKey(s => s.TransactionId)
-            .OnDelete(DeleteBehavior.Cascade);
-
         // User → GroupTransactionSplit: Restrict (avoid multiple cascade paths)
         builder.HasOne(s => s.User)
             .WithMany(u => u.GroupTransactionSplits)

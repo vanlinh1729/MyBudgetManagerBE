@@ -6,7 +6,6 @@ public class Transaction :BaseEntity
 {
     public Guid UserBalanceId { get; set; }
     public Guid CategoryId { get; set; }
-    public Guid? GroupId { get; set; }
     public decimal Amount { get; set; }
     
     public TransactionType Type { get; set; }
@@ -17,7 +16,5 @@ public class Transaction :BaseEntity
     
     // ✅ Navigation
     public UserBalance UserBalance { get; set; } = null!;
-    public virtual ICollection<GroupTransactionSplit> GroupTransactionSplits { get; set; } = new List<GroupTransactionSplit>();
     public Category Category { get; set; } = null!;
-    public Group? Group { get; set; }
 }
